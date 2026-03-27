@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Para ti 🐸</title>
+
+  <!--
+  ═══════════════════════════════════════════════
+  FUENTES — Google Fonts (no necesitas cambiar esto)
+  ═══════════════════════════════════════════════
+  -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Great+Vibes&display=swap" rel="stylesheet" />
+
+  <!--
+  ═══════════════════════════════════════════════
+  EMAILJS — Librería para enviar correos sin backend
+  Instrucciones de configuración más abajo en el JS
+  ═══════════════════════════════════════════════
+  -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+  <style>
+    /* ══════════════════════════════════════════
+       RESET Y BASE
+    ══════════════════════════════════════════ */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --crema:      #fdf6ee;
+      --rosa-claro: #f5c9c9;
+      --rosa-medio: #d9808a;
+      --rosa-oscuro:#a85060;
+      --tinto:      #5c2030;
+      --blanco:     #ffffff;
+      --negro:      #000000;
+      --texto:      #3a1a22;
+
+      --font-display: 'Great Vibes', cursive;
+      --font-body:    'Cormorant Garamond', serif;
+
+      --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: var(--crema);
+      font-family: var(--font-body);
+      color: var(--texto);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ══════════════════════════════════════════
+       PANTALLAS — sistema de navegación
+    ══════════════════════════════════════════ */
+    .screen {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 24px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.9s ease;
+    }
+
+    .screen.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    /* ══════════════════════════════════════════
+       FONDO TEXTURA SUTIL — partículas de fondo
+    ══════════════════════════════════════════ */
+    .bg-grain {
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 20% 30%, rgba(245,201,201,0.35) 0%, transparent 55%),
+        radial-gradient(circle at 80% 70%, rgba(217,128,138,0.2)  0%, transparent 55%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ══════════════════════════════════════════
+       PANTALLA 1 — Bienvenida
+    ══════════════════════════════════════════ */
+    #screen1 {
+      gap: 32px;
+      z-index: 10;
+    }
+
+    .title-main {
+      font-family: var(--font-display);
+      font-size: clamp(3rem, 14vw, 5rem);
+      color: var(--tinto);
+      text-align: center;
+      line-height: 1.1;
+      opacity: 0;
+      transform: translateY(24px);
+      animation: fadeUp 1.1s var(--ease-out-expo) 0.3s forwards;
+    }
+
+    /* ──────────────────────────────────────────
+       ZONA DE ANIMACIÓN — AQUÍ PONES TU ANIMACIÓN
+       ──────────────────────────────────────────
+       Esta caja está centrada en la pantalla.
+       Cuando tengas tu animación (GIF, Lottie, video, etc.)
+       reemplaza el contenido de #animation-container.
+       Instrucciones detalladas más abajo en los comentarios JS.
+    ────────────────────────────────────────── */
+    #animation-container {
+      width: 100%;
+      max-width: 280px;
+      height: 280px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      animation: fadeUp 1.1s var(--ease-out-expo) 0.7s forwards;
+
+      /* Borde decorativo mientras no hay animación */
+      border: 1.5px solid rgba(168, 80, 96, 0.25);
+      border-radius: 50%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Placeholder visual mientras no hay animación */
+    #animation-container .anim-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      color: var(--rosa-medio);
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      font-style: italic;
+      text-align: center;
+      padding: 16px;
+    }
+
+    #animation-container .anim-placeholder span {
+      font-size: 3rem;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-10px); }
+    }
+
+    /* Botón pasar a pantalla 2 */
+    .btn-next {
+      font-family: var(--font-body);
+      font-size: 1.05rem;
+      font-weight: 400;
+      letter-spacing: 0.12em;
+      color: var(--crema);
+      background: var(--tinto);
+      border: none;
+      border-radius: 60px;
+      padding: 14px 40px;
+      cursor: pointer;
+      opacity: 0;
+      animation: fadeUp 1.1s var(--ease-out-expo) 1.1s forwards;
+      transition: transform 0.2s ease, background 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-next:active {
+      transform: scale(0.96);
+      background: var(--rosa-oscuro);
+    }
+
+    /* Ondas en el botón al tocar */
+    .btn-next::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,0.15);
+      border-radius: inherit;
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.4s ease;
+    }
+    .btn-next:active::after { transform: scaleX(1); }
+
+    /* ══════════════════════════════════════════
+       TRANSICIÓN ENTRE PANTALLAS — Pétalos
+    ══════════════════════════════════════════ */
+    #petal-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 999;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    #petal-canvas.active { opacity: 1; }
+
+    /* ══════════════════════════════════════════
+       PANTALLA 2 — Carta
+    ══════════════════════════════════════════ */
+    #screen2 {
+      z-index: 10;
+      justify-content: flex-start;
+      padding-top: 60px;
+      padding-bottom: 60px;
+      overflow-y: auto;
+      gap: 40px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* Sobre decorativo */
+    .envelope-header {
+      width: 100%;
+      max-width: 340px;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    .envelope-header.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .envelope-header .dear {
+      font-family: var(--font-display);
+      font-size: 2.6rem;
+      color: var(--tinto);
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .envelope-header hr {
+      border: none;
+      border-top: 1px solid rgba(168,80,96,0.3);
+      margin: 0 auto;
+      width: 60%;
+    }
+
+    /* Cuerpo de la carta */
+    .letter-body {
+      width: 100%;
+      max-width: 340px;
+      font-size: 1.15rem;
+      font-weight: 300;
+      line-height: 1.85;
+      color: var(--texto);
+      min-height: 60px;
+      font-style: italic;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.8s ease 0.3s, transform 0.8s ease 0.3s;
+    }
+
+    .letter-body.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Cursor parpadeante durante el tipeo */
+    .cursor {
+      display: inline-block;
+      width: 2px;
+      height: 1.1em;
+      background: var(--rosa-medio);
+      margin-left: 2px;
+      vertical-align: middle;
+      animation: blink 0.75s step-end infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0; }
+    }
+
+    /* Sección de los botones */
+    #buttons-section {
+      width: 100%;
+      max-width: 340px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.9s ease, transform 0.9s ease;
+      pointer-events: none;
+    }
+
+    #buttons-section.visible {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: all;
+    }
+
+    .question-label {
+      font-family: var(--font-body);
+      font-size: 1rem;
+      letter-spacing: 0.06em;
+      color: var(--rosa-oscuro);
+      text-align: center;
+      font-style: italic;
+    }
+
+    .btn-choice {
+      width: 100%;
+      font-family: var(--font-body);
+      font-size: 1.1rem;
+      font-weight: 400;
+      letter-spacing: 0.08em;
+      padding: 15px 24px;
+      border-radius: 60px;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-choice:active { transform: scale(0.95); }
+
+    /* Botón SÍ */
+    #btn-yes {
+      background: var(--tinto);
+      color: var(--crema);
+    }
+
+    /* Botón alternativo */
+    #btn-no {
+      background: transparent;
+      color: var(--tinto);
+      border: 1.5px solid var(--tinto);
+    }
+
+    /* ══════════════════════════════════════════
+       PANTALLA FINAL — Fade a negro
+    ══════════════════════════════════════════ */
+    #screen-final {
+      background: var(--negro);
+      z-index: 100;
+      transition: opacity 1.8s ease;
+    }
+
+    #screen-final p {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 10vw, 3.5rem);
+      color: var(--blanco);
+      text-align: center;
+      opacity: 0;
+      transition: opacity 1.4s ease 0.8s;
+    }
+
+    #screen-final.active p { opacity: 1; }
+
+    /* ══════════════════════════════════════════
+       ANIMACIONES GLOBALES
+    ══════════════════════════════════════════ */
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Fondo textura -->
+  <div class="bg-grain"></div>
+
+  <!-- Canvas para la lluvia de pétalos de transición -->
+  <canvas id="petal-canvas"></canvas>
+
+  <!-- ════════════════════════════════════════
+       PANTALLA 1 — Bienvenida
+  ════════════════════════════════════════ -->
+  <div id="screen1" class="screen active">
+
+    <h1 class="title-main">holi mi ranita</h1>
+
+    <!--
+    ╔══════════════════════════════════════════════════════╗
+    ║   ZONA DE ANIMACIÓN — LEE ESTO ANTES DE MODIFICAR   ║
+    ╠══════════════════════════════════════════════════════╣
+    ║                                                      ║
+    ║  Opción A — GIF animado:                             ║
+    ║    Reemplaza TODO el contenido de este div con:      ║
+    ║    <img src="tu-animacion.gif" alt="animación"       ║
+    ║         style="width:100%;height:100%;              ║
+    ║                object-fit:cover;border-radius:50%"/> ║
+    ║    Sube el GIF a la misma carpeta del index.html     ║
+    ║                                                      ║
+    ║  Opción B — Lottie (animación JSON vectorial):       ║
+    ║    1. Agrega en el <head>:                           ║
+    ║       <script src="https://unpkg.com/              ║
+    ║         @lottiefiles/lottie-player"></script>        ║
+    ║    2. Reemplaza el contenido de este div con:        ║
+    ║       <lottie-player src="animacion.json"            ║
+    ║         background="transparent" speed="1"          ║
+    ║         style="width:100%;height:100%"               ║
+    ║         loop autoplay></lottie-player>               ║
+    ║                                                      ║
+    ║  Opción C — Video corto (mp4/webm):                  ║
+    ║    <video autoplay loop muted playsinline            ║
+    ║           style="width:100%;height:100%;            ║
+    ║                  object-fit:cover;border-radius:50%" ║
+    ║    >                                                 ║
+    ║      <source src="video.mp4" type="video/mp4">       ║
+    ║    </video>                                          ║
+    ║                                                      ║
+    ╚══════════════════════════════════════════════════════╝
+    -->
+    <div id="animation-container">
+      <div class="anim-placeholder">
+        <span>🐸</span>
+        aquí va<br />tu animación
+      </div>
+    </div>
+
+    <button class="btn-next" id="btn-to-letter">
+      continúa →
+    </button>
+
+  </div><!-- /screen1 -->
+
+
+  <!-- ════════════════════════════════════════
+       PANTALLA 2 — Carta + botones
+  ════════════════════════════════════════ -->
+  <div id="screen2" class="screen">
+
+    <div class="envelope-header" id="env-header">
+      <span class="dear">Para ti,</span>
+      <hr />
+    </div>
+
+    <!--
+    ╔══════════════════════════════════════════════════════╗
+    ║   TEXTO DE LA CARTA — MODIFICA AQUÍ                  ║
+    ╠══════════════════════════════════════════════════════╣
+    ║  Cambia el texto dentro de LETTER_TEXT en el JS      ║
+    ║  (está marcado claramente más abajo).                ║
+    ║  Puedes usar \n para saltos de línea.                ║
+    ╚══════════════════════════════════════════════════════╝
+    -->
+    <div class="letter-body" id="letter-body"></div>
+
+    <!-- Sección de pregunta y botones -->
+    <div id="buttons-section">
+      <p class="question-label">¿crees que estamos listos?</p>
+
+      <button class="btn-choice" id="btn-yes">sí 🌸</button>
+      <button class="btn-choice" id="btn-no">todavía no 🍃</button>
+    </div>
+
+  </div><!-- /screen2 -->
+
+
+  <!-- ════════════════════════════════════════
+       PANTALLA FINAL — Fade negro
+  ════════════════════════════════════════ -->
+  <div id="screen-final" class="screen">
+    <p>puedes dejar el celular</p>
+  </div>
+
+
+  <!-- ════════════════════════════════════════
+       JAVASCRIPT
+  ════════════════════════════════════════ -->
+  <script>
+
+    /* ══════════════════════════════════════════
+       ★ CONFIGURACIÓN — MODIFICA ESTAS VARIABLES
+    ══════════════════════════════════════════ */
+
+    /**
+     * TEXTO DE LA CARTA
+     * Escribe aquí tu carta. Usa \n para saltos de línea.
+     * Cada \n crea un párrafo nuevo.
+     */
+    const LETTER_TEXT = `Hola mi ranita hermosa,\n\nHay algo que quería decirte desde hace tiempo,
+algo que siento cada vez que estás cerca y también cuando no estás.\n\nContigo todo es más
+bonito. Las mañanas, los silencios, incluso los días raros en que nada sale bien.\n\nMe alegra
+tanto que seamos nosotros. Que seamos este equipo extraño y perfecto que somos.\n\nTe quiero
+mucho, ranita. Más de lo que sé decir con palabras.`;
+
+    /**
+     * VELOCIDAD DE ESCRITURA DE LA CARTA
+     * Tiempo en milisegundos entre cada carácter.
+     * Más bajo = más rápido. Recomendado: 38–60
+     */
+    const TYPING_SPEED = 42; // ms por caracter
+
+    /*
+    ╔══════════════════════════════════════════════════════╗
+    ║   CONFIGURACIÓN DE EMAILJS — MODIFICA AQUÍ           ║
+    ╠══════════════════════════════════════════════════════╣
+    ║                                                      ║
+    ║  1. Ve a https://www.emailjs.com/ y crea cuenta      ║
+    ║     gratuita (200 correos/mes gratis).                ║
+    ║                                                      ║
+    ║  2. En el dashboard:                                 ║
+    ║     → Email Services → Add New Service               ║
+    ║       (Gmail, Outlook, etc.)                         ║
+    ║     → Copia el Service ID → pon en EMAILJS_SERVICE   ║
+    ║                                                      ║
+    ║  3. En el dashboard:                                 ║
+    ║     → Email Templates → Create New Template          ║
+    ║     → El template puede decir algo como:             ║
+    ║       "Asunto: {{subject}}"                          ║
+    ║       "Mensaje: {{message}}"                         ║
+    ║     → Copia el Template ID → pon en EMAILJS_TEMPLATE ║
+    ║                                                      ║
+    ║  4. En el dashboard:                                 ║
+    ║     → Account → API Keys → Public Key                ║
+    ║     → Pega en EMAILJS_PUBLIC_KEY                     ║
+    ║                                                      ║
+    ║  5. Cambia EMAILJS_TO_EMAIL al correo destinatario   ║
+    ║                                                      ║
+    ╚══════════════════════════════════════════════════════╝
+    */
+    const EMAILJS_PUBLIC_KEY  = 'TU_PUBLIC_KEY_AQUI';    // ← CAMBIA ESTO
+    const EMAILJS_SERVICE     = 'TU_SERVICE_ID_AQUI';    // ← CAMBIA ESTO
+    const EMAILJS_TEMPLATE    = 'TU_TEMPLATE_ID_AQUI';   // ← CAMBIA ESTO
+    const EMAILJS_TO_EMAIL    = 'tu@correo.com';          // ← CAMBIA ESTO (a quién se envía)
+
+    /* ══════════════════════════════════════════
+       FIN CONFIGURACIÓN — No toques lo de abajo
+       salvo que sepas lo que haces :)
+    ══════════════════════════════════════════ */
+
+
+    // ── Inicializar EmailJS ──────────────────
+    emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+
+
+    // ── Referencias DOM ─────────────────────
+    const screen1       = document.getElementById('screen1');
+    const screen2       = document.getElementById('screen2');
+    const screenFinal   = document.getElementById('screen-final');
+    const btnToLetter   = document.getElementById('btn-to-letter');
+    const btnYes        = document.getElementById('btn-yes');
+    const btnNo         = document.getElementById('btn-no');
+    const letterBody    = document.getElementById('letter-body');
+    const buttonsSection= document.getElementById('buttons-section');
+    const envHeader     = document.getElementById('env-header');
+    const petalCanvas   = document.getElementById('petal-canvas');
+
+
+    /* ══════════════════════════════════════════
+       AUDIO — Sonidos con Web Audio API
+       (no necesitas archivos .mp3 externos)
+    ══════════════════════════════════════════ */
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+
+    function getAudio() {
+      if (!audioCtx) audioCtx = new AudioCtx();
+      return audioCtx;
+    }
+
+    /**
+     * Crea una nota musical suave
+     * @param {number} freq  - frecuencia Hz
+     * @param {number} start - segundos desde ahora
+     * @param {number} dur   - duración en segundos
+     * @param {number} vol   - volumen 0–1
+     * @param {string} type  - 'sine'|'triangle'|'square'
+     */
+    function playNote(freq, start, dur, vol = 0.25, type = 'sine') {
+      const ctx  = getAudio();
+      const osc  = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, ctx.currentTime + start);
+      gain.gain.setValueAtTime(0, ctx.currentTime + start);
+      gain.gain.linearRampToValueAtTime(vol, ctx.currentTime + start + 0.04);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + start + dur);
+      osc.start(ctx.currentTime + start);
+      osc.stop(ctx.currentTime + start + dur + 0.05);
+    }
+
+    /**
+     * SONIDO 1 — Botón "Sí" 🌸
+     * Acorde ascendente cálido tipo campanita
+     */
+    function playSoundYes() {
+      playNote(523.25, 0.00, 1.2, 0.22);   // Do5
+      playNote(659.25, 0.08, 1.1, 0.20);   // Mi5
+      playNote(783.99, 0.16, 1.0, 0.18);   // Sol5
+      playNote(1046.5, 0.28, 1.4, 0.15);   // Do6 — nota brillante final
+    }
+
+    /**
+     * SONIDO 2 — Botón "Todavía no" 🍃
+     * Acorde suave tipo xilófono/gong suave
+     */
+    function playSoundNo() {
+      playNote(392.00, 0.00, 1.5, 0.20, 'triangle'); // Sol4
+      playNote(493.88, 0.12, 1.3, 0.18, 'triangle'); // Si4
+      playNote(440.00, 0.30, 1.6, 0.14, 'triangle'); // La4 — resonancia larga
+    }
+
+
+    /* ══════════════════════════════════════════
+       TRANSICIÓN — Lluvia de pétalos / corazones
+    ══════════════════════════════════════════ */
+    const ctx2d = petalCanvas.getContext('2d');
+    let petals  = [];
+    let petalAnim = null;
+
+    function resizeCanvas() {
+      petalCanvas.width  = window.innerWidth;
+      petalCanvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    function spawnPetals(count = 55) {
+      petals = [];
+      for (let i = 0; i < count; i++) {
+        petals.push({
+          x:       Math.random() * petalCanvas.width,
+          y:       -30 - Math.random() * petalCanvas.height * 0.5,
+          r:       5 + Math.random() * 8,
+          vy:      1.8 + Math.random() * 3,
+          vx:      (Math.random() - 0.5) * 1.5,
+          angle:   Math.random() * Math.PI * 2,
+          spin:    (Math.random() - 0.5) * 0.08,
+          alpha:   0.6 + Math.random() * 0.4,
+          // Alterna entre corazones y puntos para variedad
+          heart:   Math.random() > 0.4,
+          hue:     Math.random() > 0.5 ? '#d9808a' : '#f5c9c9',
+        });
+      }
+    }
+
+    function drawHeart(x, y, size, alpha, color) {
+      ctx2d.save();
+      ctx2d.globalAlpha = alpha;
+      ctx2d.fillStyle   = color;
+      ctx2d.translate(x, y);
+      ctx2d.beginPath();
+      ctx2d.moveTo(0, -size * 0.3);
+      ctx2d.bezierCurveTo( size * 0.7, -size, size * 1.1,  size * 0.3, 0,  size * 0.9);
+      ctx2d.bezierCurveTo(-size * 1.1,  size * 0.3, -size * 0.7, -size, 0, -size * 0.3);
+      ctx2d.fill();
+      ctx2d.restore();
+    }
+
+    function animPetals() {
+      ctx2d.clearRect(0, 0, petalCanvas.width, petalCanvas.height);
+      let alive = false;
+      petals.forEach(p => {
+        p.y     += p.vy;
+        p.x     += p.vx + Math.sin(p.angle) * 0.6;
+        p.angle += p.spin;
+        p.alpha -= 0.003;
+        if (p.y < petalCanvas.height + 40 && p.alpha > 0) alive = true;
+
+        if (p.heart) {
+          drawHeart(p.x, p.y, p.r, Math.max(0, p.alpha), p.hue);
+        } else {
+          ctx2d.save();
+          ctx2d.globalAlpha = Math.max(0, p.alpha);
+          ctx2d.fillStyle   = p.hue;
+          ctx2d.beginPath();
+          ctx2d.arc(p.x, p.y, p.r * 0.55, 0, Math.PI * 2);
+          ctx2d.fill();
+          ctx2d.restore();
+        }
+      });
+
+      if (alive) {
+        petalAnim = requestAnimationFrame(animPetals);
+      } else {
+        petalCanvas.classList.remove('active');
+        ctx2d.clearRect(0, 0, petalCanvas.width, petalCanvas.height);
+      }
+    }
+
+    function launchPetals(callback) {
+      spawnPetals(70);
+      petalCanvas.classList.add('active');
+      if (petalAnim) cancelAnimationFrame(petalAnim);
+      petalAnim = requestAnimationFrame(animPetals);
+      setTimeout(callback, 900); // pasa a screen2 cuando los pétalos llevan 0.9s
+    }
+
+
+    /* ══════════════════════════════════════════
+       TIPEO DE CARTA — palabra por palabra
+    ══════════════════════════════════════════ */
+    function typeWriter(text, onDone) {
+      const chars     = text.split('');
+      let   i         = 0;
+      const cursor    = document.createElement('span');
+      cursor.classList.add('cursor');
+      letterBody.appendChild(cursor);
+
+      function tick() {
+        if (i >= chars.length) {
+          // terminó — quitar cursor después de 0.5s
+          setTimeout(() => {
+            cursor.remove();
+            onDone();
+          }, 500);
+          return;
+        }
+
+        const ch = chars[i++];
+        if (ch === '\n') {
+          // Inserta el salto de párrafo antes del cursor
+          const br = document.createElement('br');
+          letterBody.insertBefore(br, cursor);
+          const br2 = document.createElement('br');
+          letterBody.insertBefore(br2, cursor);
+        } else {
+          const t = document.createTextNode(ch);
+          letterBody.insertBefore(t, cursor);
+        }
+
+        // Scroll suave hacia abajo mientras se escribe
+        screen2.scrollTop = screen2.scrollHeight;
+
+        setTimeout(tick, TYPING_SPEED);
+      }
+      tick();
+    }
+
+
+    /* ══════════════════════════════════════════
+       ENVÍO DE CORREO — EmailJS
+    ══════════════════════════════════════════ */
+    function sendEmail() {
+      emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE, {
+        to_email:  EMAILJS_TO_EMAIL,
+        subject:   '🌸 Dijiste que sí',
+        message:   'Dijiste que sí. Estamos listos. Te quiero mucho. 🐸',
+      }).catch(err => console.warn('EmailJS error:', err));
+      // El catch silencia errores si aún no configuraste EmailJS
+    }
+
+
+    /* ══════════════════════════════════════════
+       FADE A NEGRO FINAL
+    ══════════════════════════════════════════ */
+    function goToFinalScreen() {
+      screenFinal.classList.add('active');
+      // El texto aparece con delay vía CSS transition
+    }
+
+
+    /* ══════════════════════════════════════════
+       FLUJO PRINCIPAL — Event listeners
+    ══════════════════════════════════════════ */
+
+    // — Botón "continúa" en screen1 → transición con pétalos → screen2 —
+    btnToLetter.addEventListener('click', () => {
+      btnToLetter.disabled = true;
+
+      launchPetals(() => {
+        // Ocultar screen1, mostrar screen2
+        screen1.classList.remove('active');
+        screen2.classList.add('active');
+
+        // Aparecer header de la carta
+        setTimeout(() => {
+          envHeader.classList.add('visible');
+          letterBody.classList.add('visible');
+        }, 200);
+
+        // Empezar tipeo después de que aparezca el header
+        setTimeout(() => {
+          typeWriter(LETTER_TEXT, () => {
+            // Espera 1 segundo y muestra los botones
+            setTimeout(() => {
+              buttonsSection.classList.add('visible');
+            }, 1000);
+          });
+        }, 700);
+      });
+    });
+
+
+    // — Botón "sí" —
+    btnYes.addEventListener('click', () => {
+      btnYes.disabled  = true;
+      btnNo.disabled   = true;
+
+      playSoundYes();
+      sendEmail();          // ← envía el correo
+
+      setTimeout(goToFinalScreen, 600);
+    });
+
+
+    // — Botón "todavía no" —
+    btnNo.addEventListener('click', () => {
+      btnYes.disabled  = true;
+      btnNo.disabled   = true;
+
+      playSoundNo();
+
+      setTimeout(goToFinalScreen, 600);
+    });
+
+  </script>
+</body>
+</html>
+```
