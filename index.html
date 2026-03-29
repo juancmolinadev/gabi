@@ -67,7 +67,6 @@
       animation: fadeUp 1.1s var(--ease-out-expo) 0.3s forwards;
     }
 
-    /* Wrapper para el canvas + hint, necesario para posicionar el hint abajo */
     #anim-wrapper {
       display: flex;
       flex-direction: column;
@@ -83,7 +82,6 @@
       overflow: hidden;
       position: relative;
       cursor: default;
-      /* Borde sutil siempre visible */
       box-shadow: 0 0 0 1.5px rgba(168,80,96,0.2);
     }
 
@@ -92,7 +90,6 @@
       display: block;
     }
 
-    /* Hint que aparece bajo la animación */
     #tap-hint {
       font-family: var(--font-body);
       font-size: 0.85rem;
@@ -105,7 +102,6 @@
       pointer-events: none;
     }
 
-    /* Pulso suave cuando la flor es clickeable */
     @keyframes pulse-ring {
       0%   { box-shadow: 0 0 0 0px  rgba(168,80,96,0.4); }
       70%  { box-shadow: 0 0 0 14px rgba(168,80,96,0);   }
@@ -128,8 +124,11 @@
     #screen2 {
       z-index: 10;
       justify-content: flex-start;
-      padding-top: 60px; padding-bottom: 60px;
-      overflow-y: auto; gap: 40px;
+      padding-top: 60px;
+      padding-bottom: 80px;
+      overflow-y: auto;
+      overflow-x: hidden;
+      gap: 0;
       -webkit-overflow-scrolling: touch;
     }
 
@@ -138,6 +137,8 @@
       text-align: center;
       opacity: 0; transform: translateY(20px);
       transition: opacity 0.8s ease, transform 0.8s ease;
+      flex-shrink: 0;
+      margin-bottom: 28px;
     }
     .envelope-header.visible { opacity: 1; transform: translateY(0); }
     .envelope-header .dear {
@@ -151,25 +152,75 @@
       margin: 0 auto; width: 60%;
     }
 
-    .letter-body {
+    /* ── Carta: contenedor que crece con el texto ── */
+    #letter-body {
       width: 100%; max-width: 340px;
       font-size: 1.15rem; font-weight: 300;
       line-height: 1.85; color: var(--texto);
-      min-height: 60px; font-style: italic;
+      font-style: italic;
       opacity: 0; transform: translateY(20px);
       transition: opacity 0.8s ease 0.3s, transform 0.8s ease 0.3s;
+      /* sin min-height fija — crece naturalmente */
+      flex-shrink: 0;
+      margin-bottom: 40px;
     }
-    .letter-body.visible { opacity: 1; transform: translateY(0); }
+    #letter-body.visible { opacity: 1; transform: translateY(0); }
 
-    .cursor {
-      display: inline-block;
-      width: 2px; height: 1.1em;
+
+
+    /* ── Botón "Toca para continuar" ── */
+    #btn-continue-wrapper {
+      width: 100%; max-width: 340px;
+      display: flex;
+      justify-content: center;
+      opacity: 0; transform: translateY(20px);
+      transition: opacity 0.9s ease, transform 0.9s ease;
+      pointer-events: none;
+      flex-shrink: 0;
+      margin-bottom: 40px;
+    }
+    #btn-continue-wrapper.visible {
+      opacity: 1; transform: translateY(0);
+      pointer-events: all;
+    }
+
+    #btn-continue {
+      position: relative;
+      font-family: var(--font-body);
+      font-size: 1rem;
+      font-style: italic;
+      letter-spacing: 0.12em;
+      color: var(--rosa-oscuro);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 0 0 6px 0;
+      outline: none;
+    }
+    #btn-continue::after {
+      content: '';
+      position: absolute;
+      left: 0; bottom: 0;
+      width: 100%; height: 1px;
       background: var(--rosa-medio);
-      margin-left: 2px; vertical-align: middle;
-      animation: blink 0.75s step-end infinite;
+      transform: scaleX(0.4);
+      transform-origin: left;
+      transition: transform 0.4s var(--ease-out-expo);
     }
-    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+    #btn-continue:hover::after,
+    #btn-continue:focus::after {
+      transform: scaleX(1);
+    }
+    #btn-continue .petal-icon {
+      display: inline-block;
+      margin-left: 6px;
+      transition: transform 0.3s ease;
+    }
+    #btn-continue:hover .petal-icon {
+      transform: rotate(20deg) scale(1.2);
+    }
 
+    /* ── Sección de botones Sí / No ── */
     #buttons-section {
       width: 100%; max-width: 340px;
       display: flex; flex-direction: column;
@@ -177,6 +228,8 @@
       opacity: 0; transform: translateY(24px);
       transition: opacity 0.9s ease, transform 0.9s ease;
       pointer-events: none;
+      flex-shrink: 0;
+      margin-bottom: 40px;
     }
     #buttons-section.visible {
       opacity: 1; transform: translateY(0);
@@ -232,7 +285,6 @@
       <div id="animation-container">
         <canvas id="frame-canvas"></canvas>
       </div>
-      <!-- Aparece cuando la animación termina -->
       <span id="tap-hint">Toca la flor para continuar </span>
     </div>
   </div>
@@ -240,14 +292,25 @@
   <!-- ════ PANTALLA 2 ════ -->
   <div id="screen2" class="screen">
     <div class="envelope-header" id="env-header">
-      <span class="dear">Para ti,</span>
+      <span class="dear">Laura Gabriela,</span>
       <hr />
     </div>
+
     <div class="letter-body" id="letter-body"></div>
+
+    <!-- Botón sutil para continuar (aparece al terminar el tipeo) -->
+    <div id="btn-continue-wrapper">
+      <button id="btn-continue">
+        toca para continuar
+        <span class="petal-icon">🌸</span>
+      </button>
+    </div>
+
+    <!-- Sección de botones (oculta al inicio) -->
     <div id="buttons-section">
       <p class="question-label">¿crees que estamos listos?</p>
-      <button class="btn-choice" id="btn-yes">sí 🌸</button>
-      <button class="btn-choice" id="btn-no">todavía no 🍃</button>
+      <button class="btn-choice" id="btn-yes">Sí 🌸</button>
+      <button class="btn-choice" id="btn-no">Todavía no 🍃</button>
     </div>
   </div>
 
@@ -262,19 +325,15 @@
        ★ MODIFICA SOLO ESTAS VARIABLES
     ══════════════════════════════════════ */
 
-    const LETTER_TEXT = `Hola mi ranita hermosa,\nHay algo que quería decirte desde hace tiempo,
-algo que siento cada vez que estás cerca y también cuando no estás. Contigo todo es más
-bonito. Las mañanas, los silencios, incluso los días raros en que nada sale bien. Me alegra
-tanto que seamos nosotros. Que seamos este equipo extraño y perfecto que somos. Te quiero
-mucho, ranita. Más de lo que sé decir con palabras.`;
+    const LETTER_TEXT = `Hola mi ranita hermosa,\nHay algo que quería decirte desde hace tiempo, algo que siento cada vez que estás cerca y también cuando no estás. Contigo todo es más bonito. Las mañanas, los silencios, incluso los días raros en que nada sale bien. Me alegra tanto que seamos nosotros. Que seamos este equipo extraño y perfecto que somos. Te quiero mucho, ranita. Más de lo que sé decir con palabras.`;
 
-    const TYPING_SPEED = 42;      // ms por carácter (más bajo = más rápido)
+    const TYPING_SPEED = 42;      // ms por carácter
 
-    const FRAME_COUNT  = 45;            // total de fotogramas
-    const FRAME_PREFIX = 'frames/frame';// carpeta/prefijo  →  frames/frame001.png
-    const FRAME_EXT    = '.png';        // extensión
-    const FRAME_DIGITS = 3;             // dígitos del número: 3 → "001"
-    const FRAME_FPS    = 12;            // velocidad en fotogramas por segundo
+    const FRAME_COUNT  = 45;
+    const FRAME_PREFIX = 'frames/frame';
+    const FRAME_EXT    = '.png';
+    const FRAME_DIGITS = 3;
+    const FRAME_FPS    = 12;
 
     const EMAILJS_PUBLIC_KEY = '0JSy8_EfuwuuJrh2B';
     const EMAILJS_SERVICE    = 'service_ofdl2cd';
@@ -287,30 +346,29 @@ mucho, ranita. Más de lo que sé decir con palabras.`;
 
     emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
 
-    const screen1        = document.getElementById('screen1');
-    const screen2        = document.getElementById('screen2');
-    const screenFinal    = document.getElementById('screen-final');
-    const btnYes         = document.getElementById('btn-yes');
-    const btnNo          = document.getElementById('btn-no');
-    const letterBody     = document.getElementById('letter-body');
-    const buttonsSection = document.getElementById('buttons-section');
-    const envHeader      = document.getElementById('env-header');
-    const petalCanvas    = document.getElementById('petal-canvas');
-    const animContainer  = document.getElementById('animation-container');
-    const tapHint        = document.getElementById('tap-hint');
-    const frameCanvas    = document.getElementById('frame-canvas');
-    const fCtx           = frameCanvas.getContext('2d');
+    const screen1          = document.getElementById('screen1');
+    const screen2          = document.getElementById('screen2');
+    const screenFinal      = document.getElementById('screen-final');
+    const btnYes           = document.getElementById('btn-yes');
+    const btnNo            = document.getElementById('btn-no');
+    const letterBody       = document.getElementById('letter-body');
+    const buttonsSection   = document.getElementById('buttons-section');
+    const btnContinueWrap  = document.getElementById('btn-continue-wrapper');
+    const btnContinue      = document.getElementById('btn-continue');
+    const envHeader        = document.getElementById('env-header');
+    const petalCanvas      = document.getElementById('petal-canvas');
+    const animContainer    = document.getElementById('animation-container');
+    const tapHint          = document.getElementById('tap-hint');
+    const frameCanvas      = document.getElementById('frame-canvas');
+    const fCtx             = frameCanvas.getContext('2d');
 
-    const SZ  = 280;                           // tamaño CSS visible (px)
-    const DPR = window.devicePixelRatio || 1;  // 2 en la mayoría de móviles, 3 en algunos
+    const SZ  = 280;
+    const DPR = window.devicePixelRatio || 1;
 
-    // El canvas tiene más píxeles reales de los que ocupa visualmente → sin borrosidad
     frameCanvas.width        = SZ * DPR;
     frameCanvas.height       = SZ * DPR;
     frameCanvas.style.width  = SZ + 'px';
     frameCanvas.style.height = SZ + 'px';
-
-    // Escalar el contexto para que drawContained siga usando coordenadas en px CSS
     fCtx.scale(DPR, DPR);
 
 
@@ -318,41 +376,30 @@ mucho, ranita. Más de lo que sé decir con palabras.`;
 
     function pad(n, d) { return String(n).padStart(d, '0'); }
 
-    /**
-     * Dibuja una imagen centrada y con "object-fit: contain":
-     * mantiene proporciones originales, nunca estira ni recorta.
-     */
     function drawContained(img) {
       fCtx.clearRect(0, 0, SZ, SZ);
       if (!img || !img.naturalWidth) return;
-      const iw = img.naturalWidth;
-      const ih = img.naturalHeight;
+      const iw = img.naturalWidth, ih = img.naturalHeight;
       const scale = Math.min(SZ / iw, SZ / ih);
-      const dw = iw * scale;
-      const dh = ih * scale;
-      const dx = (SZ - dw) / 2;
-      const dy = (SZ - dh) / 2;
+      const dw = iw * scale, dh = ih * scale;
+      const dx = (SZ - dw) / 2, dy = (SZ - dh) / 2;
       fCtx.drawImage(img, dx, dy, dw, dh);
     }
 
     const frames = [];
     let loaded = 0;
 
-    // Carga TODOS los frames antes de empezar — así el frame 1
-    // siempre se muestra correctamente y no hay saltos al inicio
     for (let i = 1; i <= FRAME_COUNT; i++) {
       const img = new Image();
       img.src = `${FRAME_PREFIX}${pad(i, FRAME_DIGITS)}${FRAME_EXT}`;
-      img.onload = () => { loaded++; if (loaded === FRAME_COUNT) startFrameAnim(); };
+      img.onload  = () => { loaded++; if (loaded === FRAME_COUNT) startFrameAnim(); };
       img.onerror = () => { loaded++; if (loaded === FRAME_COUNT) startFrameAnim(); };
       frames.push(img);
     }
 
     function startFrameAnim() {
       let cur = 0;
-      // Dibuja el frame 1 de inmediato
       drawContained(frames[0]);
-
       const iv = setInterval(() => {
         cur++;
         if (cur >= FRAME_COUNT) {
@@ -468,37 +515,86 @@ mucho, ranita. Más de lo que sé decir con palabras.`;
 
         setTimeout(() => {
           typeWriter(LETTER_TEXT, () => {
-            setTimeout(() => buttonsSection.classList.add('visible'), 1000);
+            // Al terminar el tipeo, mostrar el botón "toca para continuar"
+            setTimeout(() => {
+              btnContinueWrap.classList.add('visible');
+              screen2.scrollTop = screen2.scrollHeight;
+            }, 600);
           });
         }, 700);
       });
     }
 
+    /* Al tocar "continuar": animación de corazones, borrar carta, mostrar botones */
+    btnContinue.addEventListener('click', () => {
+      btnContinueWrap.style.pointerEvents = 'none';
+
+      launchPetals(() => {
+        // Ocultar carta y botón continuar con transición
+        letterBody.style.transition = 'opacity 0.6s ease';
+        letterBody.style.opacity = '0';
+        btnContinueWrap.style.transition = 'opacity 0.6s ease';
+        btnContinueWrap.style.opacity = '0';
+
+        setTimeout(() => {
+          // Quitar del flujo pero dejar "Laura Gabriela,"
+          letterBody.style.display = 'none';
+          btnContinueWrap.style.display = 'none';
+
+          // Scroll al inicio para ver el encabezado
+          screen2.scrollTop = 0;
+
+          // Mostrar botones de respuesta
+          setTimeout(() => {
+            buttonsSection.classList.add('visible');
+            screen2.scrollTop = screen2.scrollHeight;
+          }, 300);
+        }, 650);
+      });
+    });
+
 
     /* ══ TIPEO ════════════════════════════════ */
 
     function typeWriter(text, onDone) {
-      const chars = text.split('');
-      let i = 0;
-      const cursor = document.createElement('span');
-      cursor.classList.add('cursor');
-      letterBody.appendChild(cursor);
+      // Dividir en párrafos por \n y procesar cada segmento
+      const segments = text.split('\n');
+      let segIdx = 0;
+      let charIdx = 0;
+
+      // Crear el primer párrafo
+      let currentP = document.createElement('p');
+      currentP.style.cssText = 'margin: 0 0 0.9em 0; font-style: inherit; font-size: inherit; font-weight: inherit; line-height: inherit; color: inherit;';
+      letterBody.appendChild(currentP);
 
       function tick() {
-        if (i >= chars.length) {
-          setTimeout(() => { cursor.remove(); onDone(); }, 500);
+        if (segIdx >= segments.length) {
+          setTimeout(() => { onDone(); }, 500);
           return;
         }
-        const ch = chars[i++];
-        if (ch === '\n') {
-          letterBody.insertBefore(document.createElement('br'), cursor);
-          letterBody.insertBefore(document.createElement('br'), cursor);
-        } else {
-          letterBody.insertBefore(document.createTextNode(ch), cursor);
+
+        const seg = segments[segIdx];
+
+        if (charIdx >= seg.length) {
+          // Segmento terminado → avanzar al siguiente
+          segIdx++;
+          charIdx = 0;
+          if (segIdx < segments.length) {
+            // Nuevo párrafo
+            currentP = document.createElement('p');
+            currentP.style.cssText = 'margin: 0 0 0.9em 0; font-style: inherit; font-size: inherit; font-weight: inherit; line-height: inherit; color: inherit;';
+            letterBody.appendChild(currentP);
+          }
+          setTimeout(tick, TYPING_SPEED);
+          return;
         }
+
+        const ch = seg[charIdx++];
+        currentP.appendChild(document.createTextNode(ch));
         screen2.scrollTop = screen2.scrollHeight;
         setTimeout(tick, TYPING_SPEED);
       }
+
       tick();
     }
 
