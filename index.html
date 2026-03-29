@@ -301,9 +301,17 @@ mucho, ranita. Más de lo que sé decir con palabras.`;
     const frameCanvas    = document.getElementById('frame-canvas');
     const fCtx           = frameCanvas.getContext('2d');
 
-    const SZ = 280;
-    frameCanvas.width  = SZ;
-    frameCanvas.height = SZ;
+    const SZ  = 280;                           // tamaño CSS visible (px)
+    const DPR = window.devicePixelRatio || 1;  // 2 en la mayoría de móviles, 3 en algunos
+
+    // El canvas tiene más píxeles reales de los que ocupa visualmente → sin borrosidad
+    frameCanvas.width        = SZ * DPR;
+    frameCanvas.height       = SZ * DPR;
+    frameCanvas.style.width  = SZ + 'px';
+    frameCanvas.style.height = SZ + 'px';
+
+    // Escalar el contexto para que drawContained siga usando coordenadas en px CSS
+    fCtx.scale(DPR, DPR);
 
 
     /* ══ FOTOGRAMAS ══════════════════════════ */
