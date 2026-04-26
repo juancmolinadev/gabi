@@ -221,6 +221,34 @@
     }
 
     /* ── Sección de botones Sí / No ── */
+
+    /* ── Secuencia de Letra Taylor Swift ── */
+    #lyric-section {
+      width: 100%; max-width: 340px;
+      display: none; flex-direction: column;
+      align-items: center; justify-content: center;
+      flex-grow: 1; /* Para que ocupe el espacio central */
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      margin-bottom: 40px;
+      min-height: 120px;
+    }
+    
+    #lyric-text {
+      font-family: var(--font-display);
+      font-size: 2.8rem;
+      color: var(--tinto);
+      text-align: center;
+      line-height: 1.2;
+      opacity: 0;
+      transform: translateY(15px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    
+    #lyric-text.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
     #buttons-section {
       width: 100%; max-width: 340px;
       display: flex; flex-direction: column;
@@ -306,6 +334,10 @@
       </button>
     </div>
 
+    <div id="lyric-section">
+      <p id="lyric-text"></p>
+    </div>
+
     <!-- Sección de botones (oculta al inicio) -->
     <div id="buttons-section">
       <p class="question-label">¿crees que estamos listos?</p>
@@ -325,7 +357,7 @@
        ★ MODIFICA SOLO ESTAS VARIABLES
     ══════════════════════════════════════ */
 
-    const LETTER_TEXT = `Hola mi ranita hermosa,\nHay algo que quería decirte desde hace tiempo, algo que siento cada vez que estás cerca y también cuando no estás. Contigo todo es más bonito. Las mañanas, los silencios, incluso los días raros en que nada sale bien. Me alegra tanto que seamos nosotros. Que seamos este equipo extraño y perfecto que somos. Te quiero mucho, ranita. Más de lo que sé decir con palabras.`;
+    const LETTER_TEXT = `Gracias por acompañarme a vivir lo que sin duda fue una hermosa experiencia. Tu compañía constante es la bendición más grande de mi vida. “Porque solo tú sabes que cuando estás es más bonita la tarde”.\n\nEl tiempo desde el primer minuto en el que me diste la ilusión de que podría tenerte de esta manera tan linda ha sido la mejor época de mi vida. Cada experiencia contigo, pequeña o grande, se convierte en un recuerdo que deseo atesorar por toda mi vida, y deseo tenerte a mi lado como prueba viviente de cada hermoso recuerdo que vayamos construyendo juntos. \n\nNo solo valoro las experiencias bonitas. Valoro que estás ahí día y noche porque ambos somos felices con nuestra compañía y porque hemos logrado demostrar que todo es mejor juntos, incluso y en especial los momentos difíciles. Te pido por favor que continúes siendo mi compañera en cada momento y etapa de mi vida. Deseo formar un equipo de vida contigo porque te quiero a ti y solo a ti a mi lado. \n\nLa ilusión que me llenó cuando te referiste a este día como nuestra primera cita me llevó a planear día a día el convertir este momento en algo inolvidable para los dos.\n\nQuiero que sepas que te elijo a ti como el amor para mi vida porque no es casualidad que llore cuando escucho canciones bonitas o cuando casualmente eran las 11:11 y estábamos tomados de la mano mientras sonaba Rojo. Te amo y quiero amarte cada día y siento que el momento es ahora porque tú misma me recordaste que la vida es muy corta. No sabemos cómo será el mañana, pero lo único que sí tengo seguro es que, sin importar lo que venga, quiero que sea a tu lado. Porque cada minuto sin ti es un minuto perdido.`;
 
     const TYPING_SPEED = 42;      // ms por carácter
 
@@ -364,6 +396,9 @@
 
     const SZ  = 280;
     const DPR = window.devicePixelRatio || 1;
+
+    const lyricSection     = document.getElementById('lyric-section');
+    const lyricText        = document.getElementById('lyric-text');
 
     frameCanvas.width        = SZ * DPR;
     frameCanvas.height       = SZ * DPR;
@@ -526,6 +561,7 @@
     }
 
     /* Al tocar "continuar": animación de corazones, borrar carta, mostrar botones */
+    /* Al tocar "continuar": mostrar secuencia de Taylor Swift y luego los botones */
     btnContinue.addEventListener('click', () => {
       btnContinueWrap.style.pointerEvents = 'none';
 
@@ -537,18 +573,59 @@
         btnContinueWrap.style.opacity = '0';
 
         setTimeout(() => {
-          // Quitar del flujo pero dejar "Laura Gabriela,"
+          // Quitar del flujo pero dejar "Laura Gabriela," visible arriba
           letterBody.style.display = 'none';
           btnContinueWrap.style.display = 'none';
 
-          // Scroll al inicio para ver el encabezado
+          // Mostrar el contenedor de la letra
+          lyricSection.style.display = 'flex';
+          lyricSection.offsetHeight; // Forzar reflow para que la animación funcione
+          lyricSection.style.opacity = '1';
+
+          // Scroll al inicio
           screen2.scrollTop = 0;
 
-          // Mostrar botones de respuesta
-          setTimeout(() => {
-            buttonsSection.classList.add('visible');
-            screen2.scrollTop = screen2.scrollHeight;
-          }, 300);
+          // Arreglo con la frase dividida estéticamente en 4 partes
+          const phrases = [
+            "Pledge allegiance...",
+            "...to your hands,",
+            "your team,",
+            "your vibes ✨"
+          ];
+          
+          let pIdx = 0;
+
+          function showNextPhrase() {
+            if (pIdx < phrases.length) {
+              // 1. Ocultar la frase anterior
+              lyricText.classList.remove('show');
+              
+              setTimeout(() => {
+                // 2. Cambiar el texto y mostrarlo suavemente
+                lyricText.textContent = phrases[pIdx];
+                lyricText.classList.add('show');
+                pIdx++;
+                
+                // 3. Tiempo para leer reducido (1600ms en lugar de 2800ms)
+                setTimeout(showNextPhrase, 1600);
+              }, 450); // Tiempo de fade-out reducido
+              
+            } else {
+              // Terminó la secuencia, ocultamos el texto y mostramos los botones
+              lyricText.classList.remove('show');
+              setTimeout(() => {
+                lyricSection.style.display = 'none';
+                
+                // Ahora sí se mostrarán los botones correctamente
+                buttonsSection.classList.add('visible');
+                screen2.scrollTop = screen2.scrollHeight;
+              }, 450);
+            }
+          }
+
+          // Iniciar la secuencia
+          showNextPhrase();
+
         }, 650);
       });
     });
