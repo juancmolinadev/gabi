@@ -112,6 +112,115 @@
       animation: pulse-ring 1.8s ease-out 0.2s infinite;
     }
 
+    /* ══════════════════════════════════════════════════════════
+       ★ NUEVO: Estilos para los modales de autenticación
+    ══════════════════════════════════════════════════════════ */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .modal-overlay.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .modal-box {
+      background: var(--crema);
+      border-radius: 16px;
+      padding: 32px 24px;
+      max-width: 500px;
+      width: 100%;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 8px 32px rgba(92, 32, 48, 0.3);
+      transform: scale(0.9);
+      transition: transform 0.3s var(--ease-out-expo);
+    }
+
+    .modal-overlay.active .modal-box {
+      transform: scale(1);
+    }
+
+    .modal-title {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      color: var(--tinto);
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .modal-text {
+      font-family: var(--font-body);
+      font-size: 1rem;
+      line-height: 1.7;
+      color: var(--texto);
+      margin-bottom: 24px;
+      text-align: justify;
+    }
+
+    .modal-input {
+      width: 100%;
+      padding: 12px 16px;
+      font-family: var(--font-body);
+      font-size: 1rem;
+      border: 2px solid var(--rosa-medio);
+      border-radius: 8px;
+      background: var(--blanco);
+      color: var(--texto);
+      margin-bottom: 20px;
+      outline: none;
+      transition: border-color 0.3s ease;
+    }
+
+    .modal-input:focus {
+      border-color: var(--tinto);
+    }
+
+    .modal-btn {
+      width: 100%;
+      padding: 14px 24px;
+      font-family: var(--font-body);
+      font-size: 1.05rem;
+      font-weight: 400;
+      letter-spacing: 0.08em;
+      border: none;
+      border-radius: 60px;
+      cursor: pointer;
+      transition: transform 0.2s ease, background-color 0.3s ease;
+      margin-bottom: 12px;
+    }
+
+    .modal-btn:active {
+      transform: scale(0.95);
+    }
+
+    .modal-btn-primary {
+      background: var(--tinto);
+      color: var(--crema);
+    }
+
+    .modal-btn-secondary {
+      background: transparent;
+      color: var(--tinto);
+      border: 1.5px solid var(--tinto);
+    }
+
+    .modal-btn:last-child {
+      margin-bottom: 0;
+    }
+    /* ══════════════════════════════════════════════════════════
+       FIN: Estilos modales
+    ══════════════════════════════════════════════════════════ */
+
     /* ── Canvas pétalos ── */
     #petal-canvas {
       position: fixed; inset: 0;
@@ -305,6 +414,58 @@
   <div class="bg-grain"></div>
   <canvas id="petal-canvas"></canvas>
 
+  <!-- ══════════════════════════════════════════════════════════
+       ★ NUEVO: Modales de autenticación
+  ══════════════════════════════════════════════════════════ -->
+  
+  <!-- Modal principal de autenticación -->
+  <div id="auth-modal" class="modal-overlay">
+    <div class="modal-box">
+      <h2 class="modal-title">Holi vida mía</h2>
+      <p class="modal-text">
+        Esta página fue desarrollada como parte de una propuesta oficial para iniciar una relación sentimental.<br><br>
+        El ingreso de la clave secreta implica que has leído y aceptado los términos y condiciones previamente establecidos, así como la intención emocional detrás de este sistema.<br><br>
+        Se recomienda continuar únicamente si te encuentras preparada para descubrir el contenido y las posibles consecuencias románticas derivadas del mismo.
+      </p>
+      <input 
+        type="password" 
+        id="secret-key-input" 
+        class="modal-input" 
+        placeholder="Ingresa la clave secreta"
+        autocomplete="off"
+      />
+      <button id="btn-read-terms" class="modal-btn modal-btn-secondary">
+        Leer Términos y Condiciones
+      </button>
+      <button id="btn-confirm-key" class="modal-btn modal-btn-primary">
+        Confirmar e Ingresar
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal de términos y condiciones -->
+  <div id="terms-modal" class="modal-overlay">
+    <div class="modal-box">
+      <h2 class="modal-title">Términos y Condiciones</h2>
+      <p class="modal-text">
+        El ingreso de esta clave implica la aceptación consciente y voluntaria de los presentes términos y condiciones, así como la comprensión de la motivación y el significado detrás de este regalo.<br><br>
+        Asimismo, se informa a la usuaria única, Laura Gabriela Suárez, que debido a la naturaleza de esta propuesta, no se recomienda acceder al contenido hasta sentirse plenamente preparada para emitir una respuesta positiva. El acceso prematuro por simple curiosidad podría generar expectativas, interpretaciones o consecuencias emocionales para las cuales el sistema asume que la usuaria ya se encuentra preparada.<br><br>
+        Por motivos de seguridad y seguimiento del proceso, el ingreso de este código y la posterior visualización del contenido serán notificados automáticamente al desarrollador. En consecuencia, dicho acceso será interpretado como una manifestación explícita de disposición para dar un paso adelante en la relación con el mismo.<br><br>
+        Se invita cordialmente a abstenerse de ingresar al sistema si no existe una preparación real para aceptar las implicaciones emocionales y sentimentales derivadas de estos términos.<br><br>
+        Desde el equipo de desarrollo esperamos con entusiasmo la notificación del ingreso exitoso de su contraseña y su próximo compromiso sentimental con nosotros.<br><br>
+        Atentamente,<br>
+        <strong>Tu futuro esposo.</strong>
+      </p>
+      <button id="btn-close-terms" class="modal-btn modal-btn-primary">
+        Cerrar
+      </button>
+    </div>
+  </div>
+  
+  <!-- ══════════════════════════════════════════════════════════
+       FIN: Modales de autenticación
+  ══════════════════════════════════════════════════════════ -->
+
   <!-- ════ PANTALLA 1 ════ -->
   <div id="screen1" class="screen active">
     <h1 class="title-main">Holi mi ranita</h1>
@@ -357,7 +518,7 @@
        ★ MODIFICA SOLO ESTAS VARIABLES
     ══════════════════════════════════════ */
 
-    const LETTER_TEXT = `Gracias por acompañarme a vivir lo que sin duda fue una hermosa experiencia. Tu compañía constante es la bendición más grande de mi vida. “Porque solo tú sabes que cuando estás es más bonita la tarde”.\n\nEl tiempo desde el primer minuto en el que me diste la ilusión de que podría tenerte de esta manera tan linda ha sido la mejor época de mi vida. Cada experiencia contigo, pequeña o grande, se convierte en un recuerdo que deseo atesorar por toda mi vida, y deseo tenerte a mi lado como prueba viviente de cada hermoso recuerdo que vayamos construyendo juntos. \n\nNo solo valoro las experiencias bonitas. Valoro que estás ahí día y noche porque ambos somos felices con nuestra compañía y porque hemos logrado demostrar que todo es mejor juntos, incluso y en especial los momentos difíciles. Te pido por favor que continúes siendo mi compañera en cada momento y etapa de mi vida. Deseo formar un equipo de vida contigo porque te quiero a ti y solo a ti a mi lado. \n\nLa ilusión que me llenó cuando te referiste a este día como nuestra primera cita me llevó a planear día a día el convertir este momento en algo inolvidable para los dos.\n\nQuiero que sepas que te elijo a ti como el amor para mi vida porque no es casualidad que llore cuando escucho canciones bonitas o cuando justo eran las 11:11 y estábamos tomados de la mano mientras sonaba "Rojo". Te amo y quiero amarte cada día, siento que el momento es ahora porque tú misma me recordaste que la vida es muy corta. No sabemos cómo será el mañana, pero lo único que sí tengo seguro es que, sin importar lo que venga, quiero que sea a tu lado. Porque cada minuto sin ti es un minuto perdido.`;
+    const LETTER_TEXT = `Gracias por acompañarme a vivir lo que sin duda fue una hermosa experiencia. Tu compañía constante es la bendición más grande de mi vida. "Porque solo tú sabes que cuando estás es más bonita la tarde".\n\nEl tiempo desde el primer minuto en el que me diste la ilusión de que podría tenerte de esta manera tan linda ha sido la mejor época de mi vida. Cada experiencia contigo, pequeña o grande, se convierte en un recuerdo que deseo atesorar por toda mi vida, y deseo tenerte a mi lado como prueba viviente de cada hermoso recuerdo que vayamos construyendo juntos. \n\nNo solo valoro las experiencias bonitas. Valoro que estás ahí día y noche porque ambos somos felices con nuestra compañía y porque hemos logrado demostrar que todo es mejor juntos, incluso y en especial los momentos difíciles. Te pido por favor que continúes siendo mi compañera en cada momento y etapa de mi vida. Deseo formar un equipo de vida contigo porque te quiero a ti y solo a ti a mi lado. \n\nLa ilusión que me llenó cuando te referiste a este día como nuestra primera cita me llevó a planear día a día el convertir este momento en algo inolvidable para los dos.\n\nQuiero que sepas que te elijo a ti como el amor para mi vida porque no es casualidad que llore cuando escucho canciones bonitas o cuando justo eran las 11:11 y estábamos tomados de la mano mientras sonaba "Rojo". Te amo y quiero amarte cada día, siento que el momento es ahora porque tú misma me recordaste que la vida es muy corta. No sabemos cómo será el mañana, pero lo único que sí tengo seguro es que, sin importar lo que venga, quiero que sea a tu lado. Porque cada minuto sin ti es un minuto perdido.`;
 
     const TYPING_SPEED = 40;      // ms por carácter
 
@@ -367,16 +528,29 @@
     const FRAME_DIGITS = 3;
     const FRAME_FPS    = 12;
 
-    const not_variable1 = '0JSy8_EfuwuuJrh2B';
+    /* ══════════════════════════════════════════════════════════
+       ★ MODIFICADO: Esta variable ahora se asigna dinámicamente
+       desde el input del usuario en el modal de autenticación
+    ══════════════════════════════════════════════════════════ */
+    let not_variable1 = ''; // Ahora inicia vacía, se llena con el input del usuario
+
     const EMAILJS_SERVICE    = 'service_ofdl2cd';
     const EMAILJS_TEMPLATE   = 'template_7rynpug';
-    const EMAILJS_TO_EMAIL   = 'noway.com';
+    const EMAILJS_TO_EMAIL   = 'kmilo3molina@gmail.com';
 
     /* ══════════════════════════════════════
        FIN CONFIGURACIÓN
     ══════════════════════════════════════ */
 
-    emailjs.init({ publicKey: not_variable1 });
+    /* ══════════════════════════════════════════════════════════
+       ★ NUEVO: Referencias a los modales
+    ══════════════════════════════════════════════════════════ */
+    const authModal = document.getElementById('auth-modal');
+    const termsModal = document.getElementById('terms-modal');
+    const secretKeyInput = document.getElementById('secret-key-input');
+    const btnReadTerms = document.getElementById('btn-read-terms');
+    const btnConfirmKey = document.getElementById('btn-confirm-key');
+    const btnCloseTerms = document.getElementById('btn-close-terms');
 
     const screen1          = document.getElementById('screen1');
     const screen2          = document.getElementById('screen2');
@@ -405,6 +579,47 @@
     frameCanvas.style.width  = SZ + 'px';
     frameCanvas.style.height = SZ + 'px';
     fCtx.scale(DPR, DPR);
+
+
+    /* ══════════════════════════════════════════════════════════
+       ★ NUEVO: Funcionalidad de los modales de autenticación
+    ══════════════════════════════════════════════════════════ */
+    
+    // Abrir modal de términos y condiciones
+    btnReadTerms.addEventListener('click', () => {
+      termsModal.classList.add('active');
+    });
+
+    // Cerrar modal de términos y condiciones
+    btnCloseTerms.addEventListener('click', () => {
+      termsModal.classList.remove('active');
+    });
+
+    // Confirmar clave secreta y continuar con el flujo original
+    btnConfirmKey.addEventListener('click', () => {
+      const inputValue = secretKeyInput.value.trim();
+      
+      if (inputValue === '') {
+        alert('Por favor ingresa la clave secreta para continuar.');
+        return;
+      }
+
+      // Asignar el valor ingresado a la variable que usa EmailJS
+      not_variable1 = inputValue;
+      
+      // Inicializar EmailJS con la clave ingresada
+      emailjs.init({ publicKey: not_variable1 });
+
+      // Cerrar el modal de autenticación
+      authModal.classList.remove('active');
+
+      // Continuar con el flujo original (mostrar la carta)
+      proceedToLetter();
+    });
+
+    /* ══════════════════════════════════════════════════════════
+       FIN: Funcionalidad modales
+    ══════════════════════════════════════════════════════════ */
 
 
     /* ══ FOTOGRAMAS ══════════════════════════ */
@@ -452,8 +667,47 @@
       setTimeout(() => {
         animContainer.classList.add('clickable');
         tapHint.style.opacity = '1';
-        animContainer.addEventListener('click', goToLetter, { once: true });
+        /* ══════════════════════════════════════════════════════════
+           ★ MODIFICADO: Al hacer clic en la flor, ahora se muestra
+           el modal de autenticación en lugar de ir directo a la carta
+        ══════════════════════════════════════════════════════════ */
+        animContainer.addEventListener('click', showAuthModal, { once: true });
       }, 350);
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       ★ NUEVO: Función para mostrar el modal de autenticación
+    ══════════════════════════════════════════════════════════ */
+    function showAuthModal() {
+      tapHint.style.opacity = '0';
+      animContainer.classList.remove('clickable');
+      authModal.classList.add('active');
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       ★ NUEVO: Función separada que ejecuta el flujo original
+       (lo que antes hacía goToLetter directamente)
+    ══════════════════════════════════════════════════════════ */
+    function proceedToLetter() {
+      launchPetals(() => {
+        screen1.classList.remove('active');
+        screen2.classList.add('active');
+
+        setTimeout(() => {
+          envHeader.classList.add('visible');
+          letterBody.classList.add('visible');
+        }, 200);
+
+        setTimeout(() => {
+          typeWriter(LETTER_TEXT, () => {
+            // Al terminar el tipeo, mostrar el botón "toca para continuar"
+            setTimeout(() => {
+              btnContinueWrap.classList.add('visible');
+              screen2.scrollTop = screen2.scrollHeight;
+            }, 600);
+          });
+        }, 700);
+      });
     }
 
 
@@ -534,31 +788,9 @@
 
 
     /* ══ NAVEGACIÓN ══════════════════════════ */
+    /* Esta función ya no se llama directamente al hacer clic en la flor
+       ahora se llama showAuthModal() primero */
 
-    function goToLetter() {
-      tapHint.style.opacity = '0';
-      animContainer.classList.remove('clickable');
-
-      launchPetals(() => {
-        screen1.classList.remove('active');
-        screen2.classList.add('active');
-
-        setTimeout(() => {
-          envHeader.classList.add('visible');
-          letterBody.classList.add('visible');
-        }, 200);
-
-        setTimeout(() => {
-          typeWriter(LETTER_TEXT, () => {
-            // Al terminar el tipeo, mostrar el botón "toca para continuar"
-            setTimeout(() => {
-              btnContinueWrap.classList.add('visible');
-              screen2.scrollTop = screen2.scrollHeight;
-            }, 600);
-          });
-        }, 700);
-      });
-    }
 
     /* Al tocar "continuar": animación de corazones, borrar carta, mostrar botones */
     /* Al tocar "continuar": mostrar secuencia de Taylor Swift y luego los botones */
