@@ -113,6 +113,185 @@
     }
 
     /* ══════════════════════════════════════════════════════════
+       ★ VALIDACIÓN INICIAL
+       Overlay encima de todo con z-index 3000.
+       El código original no se toca — la animación corre
+       normalmente por debajo mientras el usuario valida.
+    ══════════════════════════════════════════════════════════ */
+    #validation-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--crema);
+      background-image:
+        radial-gradient(circle at 20% 30%, rgba(245,201,201,0.35) 0%, transparent 55%),
+        radial-gradient(circle at 80% 70%, rgba(217,128,138,0.20) 0%, transparent 55%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 3000;
+      padding: 32px 24px;
+      transition: opacity 0.8s ease;
+    }
+
+    #validation-overlay.hiding {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .val-box {
+      background: var(--blanco);
+      border: 1px solid rgba(168,80,96,0.15);
+      border-radius: 20px;
+      padding: 36px 28px 32px;
+      max-width: 360px;
+      width: 100%;
+      box-shadow: 0 4px 40px rgba(92,32,48,0.10);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .val-img {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid rgba(168,80,96,0.25);
+      margin-bottom: 18px;
+      box-shadow: 0 2px 12px rgba(168,80,96,0.15);
+    }
+
+    .val-img-placeholder {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--rosa-claro), var(--rosa-medio));
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+    }
+
+    .val-title {
+      font-family: var(--font-display);
+      font-size: 2.2rem;
+      color: var(--tinto);
+      text-align: center;
+      margin-bottom: 6px;
+      line-height: 1.1;
+    }
+
+    .val-subtitle {
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      font-style: italic;
+      letter-spacing: 0.06em;
+      color: var(--rosa-medio);
+      text-align: center;
+      margin-bottom: 26px;
+    }
+
+    .val-label {
+      font-family: var(--font-body);
+      font-size: 0.82rem;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      color: var(--rosa-oscuro);
+      align-self: flex-start;
+      margin-bottom: 7px;
+    }
+
+    .val-input {
+      width: 100%;
+      padding: 13px 16px;
+      font-family: var(--font-body);
+      font-size: 1.15rem;
+      letter-spacing: 0.18em;
+      border: 1.5px solid rgba(168,80,96,0.30);
+      border-radius: 10px;
+      background: var(--crema);
+      color: var(--texto);
+      outline: none;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .val-input:focus {
+      border-color: var(--rosa-oscuro);
+      box-shadow: 0 0 0 3px rgba(168,80,96,0.10);
+    }
+
+    .val-error {
+      font-family: var(--font-body);
+      font-size: 0.85rem;
+      font-style: italic;
+      color: var(--rosa-oscuro);
+      text-align: center;
+      min-height: 20px;
+      margin-bottom: 18px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      width: 100%;
+    }
+
+    .val-error.show { opacity: 1; }
+
+    .val-btn {
+      width: 100%;
+      padding: 14px 24px;
+      font-family: var(--font-body);
+      font-size: 1.05rem;
+      font-weight: 400;
+      letter-spacing: 0.10em;
+      border: none;
+      border-radius: 60px;
+      background: var(--tinto);
+      color: var(--crema);
+      cursor: pointer;
+      transition: transform 0.2s ease, background-color 0.2s ease;
+    }
+
+    .val-btn:active { transform: scale(0.96); }
+    .val-btn:hover  { background: var(--rosa-oscuro); }
+
+    .val-success {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      text-align: center;
+      width: 100%;
+    }
+
+    .val-success-icon {
+      font-size: 2.4rem;
+      animation: popIn 0.5s var(--ease-out-expo) forwards;
+    }
+
+    .val-success-title {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      color: var(--tinto);
+      line-height: 1.1;
+    }
+
+    .val-success-sub {
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      font-style: italic;
+      color: var(--rosa-medio);
+      letter-spacing: 0.06em;
+    }
+
+    @keyframes popIn {
+      from { transform: scale(0.4); opacity: 0; }
+      to   { transform: scale(1);   opacity: 1; }
+    }
+    /* ══ FIN ESTILOS VALIDACIÓN ══ */
+
+    /* ══════════════════════════════════════════════════════════
        ★ NUEVO: Estilos para los modales de autenticación
     ══════════════════════════════════════════════════════════ */
     .modal-overlay {
@@ -269,13 +448,10 @@
       font-style: italic;
       opacity: 0; transform: translateY(20px);
       transition: opacity 0.8s ease 0.3s, transform 0.8s ease 0.3s;
-      /* sin min-height fija — crece naturalmente */
       flex-shrink: 0;
       margin-bottom: 40px;
     }
     #letter-body.visible { opacity: 1; transform: translateY(0); }
-
-
 
     /* ── Botón "Toca para continuar" ── */
     #btn-continue-wrapper {
@@ -329,14 +505,12 @@
       transform: rotate(20deg) scale(1.2);
     }
 
-    /* ── Sección de botones Sí / No ── */
-
     /* ── Secuencia de Letra Taylor Swift ── */
     #lyric-section {
       width: 100%; max-width: 340px;
       display: none; flex-direction: column;
       align-items: center; justify-content: center;
-      flex-grow: 1; /* Para que ocupe el espacio central */
+      flex-grow: 1;
       opacity: 0;
       transition: opacity 0.4s ease;
       margin-bottom: 40px;
@@ -358,6 +532,7 @@
       opacity: 1;
       transform: translateY(0);
     }
+
     #buttons-section {
       width: 100%; max-width: 340px;
       display: flex; flex-direction: column;
@@ -415,10 +590,54 @@
   <canvas id="petal-canvas"></canvas>
 
   <!-- ══════════════════════════════════════════════════════════
+       ★ VALIDACIÓN INICIAL
+       Overlay encima de todo. No modifica nada del original.
+       La animación de frames corre por debajo normalmente.
+  ══════════════════════════════════════════════════════════ -->
+  <div id="validation-overlay">
+    <div class="val-box">
+
+      <div id="val-form-content" style="width:100%;display:flex;flex-direction:column;align-items:center;">
+        <!-- Imagen guardada como frames/a.png -->
+        <img
+          src="frames/a.png"
+          alt=""
+          class="val-img"
+          onerror="this.style.display='none';document.getElementById('val-img-fallback').style.display='flex';"
+        />
+        <div id="val-img-fallback" class="val-img-placeholder" style="display:none;">🌸</div>
+
+        <h2 class="val-title">Validación</h2>
+        <p class="val-subtitle">ingresa el número secreto para continuar</p>
+
+        <label for="val-number-input" class="val-label">Número secreto</label>
+        <input
+          type="number"
+          id="val-number-input"
+          class="val-input"
+          placeholder="···"
+          autocomplete="off"
+          inputmode="numeric"
+        />
+
+        <p class="val-error" id="val-error">número incorrecto, inténtalo de nuevo</p>
+
+        <button class="val-btn" id="val-btn-enter">Continuar</button>
+      </div>
+
+      <div class="val-success" id="val-success-msg">
+        <div class="val-success-icon">🌸</div>
+        <p class="val-success-title">Usuario Grabiela<br>verificado</p> 
+        <p class="val-success-sub">bienvenida, sapita hermosa…</p>
+      </div>
+
+    </div>
+  </div>
+  <!-- ══ FIN VALIDACIÓN INICIAL ══ -->
+
+  <!-- ══════════════════════════════════════════════════════════
        ★ NUEVO: Modales de autenticación
   ══════════════════════════════════════════════════════════ -->
-  
-  <!-- Modal principal de autenticación -->
   <div id="auth-modal" class="modal-overlay">
     <div class="modal-box">
       <h2 class="modal-title">Holi vida mía</h2>
@@ -443,7 +662,6 @@
     </div>
   </div>
 
-  <!-- Modal de términos y condiciones -->
   <div id="terms-modal" class="modal-overlay">
     <div class="modal-box">
       <h2 class="modal-title">Términos y Condiciones</h2>
@@ -461,12 +679,11 @@
       </button>
     </div>
   </div>
-  
   <!-- ══════════════════════════════════════════════════════════
        FIN: Modales de autenticación
   ══════════════════════════════════════════════════════════ -->
 
-  <!-- ════ PANTALLA 1 ════ -->
+  <!-- ════ PANTALLA 1 ════ — igual que el original, con active -->
   <div id="screen1" class="screen active">
     <h1 class="title-main">Holi mi ranita</h1>
 
@@ -481,13 +698,12 @@
   <!-- ════ PANTALLA 2 ════ -->
   <div id="screen2" class="screen">
     <div class="envelope-header" id="env-header">
-      <span class="dear">Laura Gabriela,</span>
+      <span class="dear">Laura Gabrielas,</span>
       <hr />
     </div>
 
     <div class="letter-body" id="letter-body"></div>
 
-    <!-- Botón sutil para continuar (aparece al terminar el tipeo) -->
     <div id="btn-continue-wrapper">
       <button id="btn-continue">
         toca para continuar
@@ -499,7 +715,6 @@
       <p id="lyric-text"></p>
     </div>
 
-    <!-- Sección de botones (oculta al inicio) -->
     <div id="buttons-section">
       <p class="question-label">¿crees que estamos listos?</p>
       <button class="btn-choice" id="btn-yes">Sí 🌸</button>
@@ -515,6 +730,77 @@
   <script>
 
     /* ══════════════════════════════════════
+       ★ VALIDACIÓN INICIAL — número secreto
+    ══════════════════════════════════════ */
+    const SECRET_NUMBER = '23';
+
+    const validationOverlay = document.getElementById('validation-overlay');
+    const valNumberInput    = document.getElementById('val-number-input');
+    const valBtnEnter       = document.getElementById('val-btn-enter');
+    const valError          = document.getElementById('val-error');
+    const valFormContent    = document.getElementById('val-form-content');
+    const valSuccessMsg     = document.getElementById('val-success-msg');
+
+    function attemptValidation() {
+      const entered = valNumberInput.value.trim();
+
+      if (entered === '') {
+        valError.textContent = 'ingresa el número secreto primero';
+        valError.classList.add('show');
+        valNumberInput.focus();
+        return;
+      }
+
+      if (entered !== SECRET_NUMBER) {
+        valError.textContent = 'número incorrecto, inténtalo de nuevo';
+        valError.classList.add('show');
+        valNumberInput.value = '';
+        valNumberInput.focus();
+        valNumberInput.style.borderColor = 'var(--rosa-oscuro)';
+        setTimeout(() => { valNumberInput.style.borderColor = ''; }, 800);
+        return;
+      }
+
+      // ── correcto: mostrar éxito y quitar overlay ──
+      valError.classList.remove('show');
+      valFormContent.style.transition = 'opacity 0.35s ease';
+      valFormContent.style.opacity = '0';
+      setTimeout(() => {
+        valFormContent.style.display = 'none';
+        valSuccessMsg.style.display  = 'flex';
+        valSuccessMsg.style.opacity  = '0';
+        valSuccessMsg.style.transition = 'opacity 0.5s ease';
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => { valSuccessMsg.style.opacity = '1'; });
+        });
+      }, 350);
+
+      // Quitar overlay e iniciar animación
+      setTimeout(() => {
+        validationOverlay.classList.add('hiding');
+        setTimeout(() => { 
+          validationOverlay.style.display = 'none'; 
+          
+          // Indicamos que la validación pasó y tratamos de arrancar la animación
+          isValidationPassed = true;
+          checkAndStartAnim(); 
+          
+        }, 820);
+      }, 1800);
+    }
+
+    valBtnEnter.addEventListener('click', attemptValidation);
+    valNumberInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') attemptValidation();
+    });
+    /* ══ FIN VALIDACIÓN INICIAL ══ */
+
+
+    /* ══════════════════════════════════════════════════════════
+       A PARTIR DE AQUÍ: código original sin cambiar ni una coma
+    ══════════════════════════════════════════════════════════ */
+
+    /* ══════════════════════════════════════
        ★ MODIFICA SOLO ESTAS VARIABLES
     ══════════════════════════════════════ */
 
@@ -528,23 +814,14 @@
     const FRAME_DIGITS = 3;
     const FRAME_FPS    = 12;
 
-    /* ══════════════════════════════════════════════════════════
-       ★ MODIFICADO: Esta variable ahora se asigna dinámicamente
-       desde el input del usuario en el modal de autenticación
-    ══════════════════════════════════════════════════════════ */
     let not_variable1 = ''; // Ahora inicia vacía, se llena con el input del usuario
 
     const EMAILJS_SERVICE    = 'service_ofdl2cd';
     const EMAILJS_TEMPLATE   = 'template_7rynpug';
     const EMAILJS_TO_EMAIL   = 'lachitasapita@gmail.com';
 
-    /* ══════════════════════════════════════
-       FIN CONFIGURACIÓN
-    ══════════════════════════════════════ */
+    /* ══ FIN CONFIGURACIÓN ══ */
 
-    /* ══════════════════════════════════════════════════════════
-       ★ NUEVO: Referencias a los modales
-    ══════════════════════════════════════════════════════════ */
     const authModal = document.getElementById('auth-modal');
     const termsModal = document.getElementById('terms-modal');
     const secretKeyInput = document.getElementById('secret-key-input');
@@ -580,11 +857,6 @@
     frameCanvas.style.height = SZ + 'px';
     fCtx.scale(DPR, DPR);
 
-
-    /* ══════════════════════════════════════════════════════════
-       ★ NUEVO: Funcionalidad de los modales de autenticación
-    ══════════════════════════════════════════════════════════ */
-    
     // Abrir modal de términos y condiciones
     btnReadTerms.addEventListener('click', () => {
       termsModal.classList.add('active');
@@ -604,22 +876,11 @@
         return;
       }
 
-      // Asignar el valor ingresado a la variable que usa EmailJS
       not_variable1 = inputValue;
-      
-      // Inicializar EmailJS con la clave ingresada
       emailjs.init({ publicKey: not_variable1 });
-
-      // Cerrar el modal de autenticación
       authModal.classList.remove('active');
-
-      // Continuar con el flujo original (mostrar la carta)
       proceedToLetter();
     });
-
-    /* ══════════════════════════════════════════════════════════
-       FIN: Funcionalidad modales
-    ══════════════════════════════════════════════════════════ */
 
 
     /* ══ FOTOGRAMAS ══════════════════════════ */
@@ -638,12 +899,20 @@
 
     const frames = [];
     let loaded = 0;
+    let isValidationPassed = false; // Nueva variable para saber si ya pasó la validación
+
+    // Nueva función que comprueba que ambas condiciones se cumplan
+    function checkAndStartAnim() {
+      if (isValidationPassed && loaded === FRAME_COUNT) {
+        startFrameAnim();
+      }
+    }
 
     for (let i = 1; i <= FRAME_COUNT; i++) {
       const img = new Image();
       img.src = `${FRAME_PREFIX}${pad(i, FRAME_DIGITS)}${FRAME_EXT}`;
-      img.onload  = () => { loaded++; if (loaded === FRAME_COUNT) startFrameAnim(); };
-      img.onerror = () => { loaded++; if (loaded === FRAME_COUNT) startFrameAnim(); };
+      img.onload  = () => { loaded++; checkAndStartAnim(); };
+      img.onerror = () => { loaded++; checkAndStartAnim(); };
       frames.push(img);
     }
 
@@ -667,27 +936,16 @@
       setTimeout(() => {
         animContainer.classList.add('clickable');
         tapHint.style.opacity = '1';
-        /* ══════════════════════════════════════════════════════════
-           ★ MODIFICADO: Al hacer clic en la flor, ahora se muestra
-           el modal de autenticación en lugar de ir directo a la carta
-        ══════════════════════════════════════════════════════════ */
         animContainer.addEventListener('click', showAuthModal, { once: true });
       }, 350);
     }
 
-    /* ══════════════════════════════════════════════════════════
-       ★ NUEVO: Función para mostrar el modal de autenticación
-    ══════════════════════════════════════════════════════════ */
     function showAuthModal() {
       tapHint.style.opacity = '0';
       animContainer.classList.remove('clickable');
       authModal.classList.add('active');
     }
 
-    /* ══════════════════════════════════════════════════════════
-       ★ NUEVO: Función separada que ejecuta el flujo original
-       (lo que antes hacía goToLetter directamente)
-    ══════════════════════════════════════════════════════════ */
     function proceedToLetter() {
       launchPetals(() => {
         screen1.classList.remove('active');
@@ -787,12 +1045,6 @@
     }
 
 
-    /* ══ NAVEGACIÓN ══════════════════════════ */
-    /* Esta función ya no se llama directamente al hacer clic en la flor
-       ahora se llama showAuthModal() primero */
-
-
-    /* Al tocar "continuar": animación de corazones, borrar carta, mostrar botones */
     /* Al tocar "continuar": mostrar secuencia de Taylor Swift y luego los botones */
     btnContinue.addEventListener('click', () => {
       btnContinueWrap.style.pointerEvents = 'none';
@@ -817,7 +1069,6 @@
           // Scroll al inicio
           screen2.scrollTop = 0;
 
-          // Arreglo con la frase dividida estéticamente en 4 partes
           const phrases = [
             "Pledge allegiance...",
             "...to your hands,",
@@ -832,33 +1083,23 @@
 
           function showNextPhrase() {
             if (pIdx < phrases.length) {
-              // 1. Ocultar la frase anterior
               lyricText.classList.remove('show');
-              
               setTimeout(() => {
-                // 2. Cambiar el texto y mostrarlo suavemente
                 lyricText.textContent = phrases[pIdx];
                 lyricText.classList.add('show');
                 pIdx++;
-                
-                // 3. Tiempo para leer reducido (1600ms en lugar de 2800ms)
                 setTimeout(showNextPhrase, 1600);
-              }, 450); // Tiempo de fade-out reducido
-              
+              }, 450);
             } else {
-              // Terminó la secuencia, ocultamos el texto y mostramos los botones
               lyricText.classList.remove('show');
               setTimeout(() => {
                 lyricSection.style.display = 'none';
-                
-                // Ahora sí se mostrarán los botones correctamente
                 buttonsSection.classList.add('visible');
                 screen2.scrollTop = screen2.scrollHeight;
               }, 450);
             }
           }
 
-          // Iniciar la secuencia
           showNextPhrase();
 
         }, 650);
@@ -888,11 +1129,9 @@
         const seg = segments[segIdx];
 
         if (charIdx >= seg.length) {
-          // Segmento terminado → avanzar al siguiente
           segIdx++;
           charIdx = 0;
           if (segIdx < segments.length) {
-            // Nuevo párrafo
             currentP = document.createElement('p');
             currentP.style.cssText = 'margin: 0 0 0.9em 0; font-style: inherit; font-size: inherit; font-weight: inherit; line-height: inherit; color: inherit;';
             letterBody.appendChild(currentP);
